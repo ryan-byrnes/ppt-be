@@ -1,17 +1,25 @@
 package main
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
-	"github.com/ryan-byrnes/ppt-be/models"
+	"github.com/julienschmidt/httprouter"
 )
 
-func (app *application) getExercise(w http.ResponseWriter, r *http.Request) {
+func (app *application) getPersonalRecords(w http.ResponseWriter, r *http.Request) {
 
-	backsquat := models.Exercise{
-		Id:           1,
-		ExerciseName: "Back Squat",
+	params := httprouter.ParamsFromContext(r.Context())
+
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		app.logger.Print(errors.New("invalid id"))
+		app.errorJson(w, err)
+		return
 	}
 
-	app.writeJson(w, http.StatusOK, backsquat, "exercise")
+	personalRecords, err := app.models.DB.Get(id)
+
+	app.writeJson(w, http.StatusOK, personalRecords, "personal records")
 }
