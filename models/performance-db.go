@@ -26,10 +26,13 @@ func (m *DBModel) Get(id int) ([]*PersonalRecord, error) {
 		var personalRecord PersonalRecord
 
 		err := rows.Scan(
+			&personalRecord.Id,
+			&personalRecord.ExerciseId,
 			&personalRecord.Exercise,
 			&personalRecord.Reps,
 			&personalRecord.Weight,
 			&personalRecord.CreatedAt,
+			&personalRecord.UpdatedAt,
 		)
 		if err != nil {
 			return nil, err
