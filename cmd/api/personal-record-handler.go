@@ -14,12 +14,14 @@ func (app *application) getPersonalRecords(w http.ResponseWriter, r *http.Reques
 
 	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
-		app.logger.Print(errors.New("invalid id"))
+		app.logger.Print(errors.New("invalid userId"))
 		app.errorJson(w, err)
 		return
 	}
 
-	personalRecords, err := app.models.DB.Get(id)
+	personalRecords, _ := app.models.DB.Get(id)
+
+	app.logger.Println("personal records", personalRecords)
 
 	app.writeJson(w, http.StatusOK, personalRecords, "personal records")
 }
