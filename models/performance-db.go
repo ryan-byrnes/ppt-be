@@ -11,7 +11,7 @@ type DBModel struct {
 	DB *sql.DB
 }
 
-func (m *DBModel) Get(id int) ([]*PersonalRecord, error) {
+func (m *DBModel) GetAllPersonalRecords(id int) ([]*PersonalRecord, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -40,4 +40,29 @@ func (m *DBModel) Get(id int) ([]*PersonalRecord, error) {
 	log.Println("personal Records: ", personalRecords)
 
 	return personalRecords, nil
+}
+
+func (m *DBModel) InsertPersonalRecord(personalRecord PersonalRecord) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `insert into "personalRecords" (user_id, exercise_id, exercise_name, reps, weight, created_at, updated_at) 
+			  values ($1, $2, $3, $4, $5, $6, $7))`
+
+	_, err := m.DB.ExecContext(ctx, query,
+		personalRecord.UserId,
+		personalRecord.ExerciseId,
+		personalRecord.ExerciseName,
+		personalRecord.Reps,
+		personalRecord.Weight,
+		personalRecord.CreatedAt,
+		personalRecord.UpdatedAt,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }
