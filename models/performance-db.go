@@ -66,3 +66,26 @@ func (m *DBModel) InsertPersonalRecord(personalRecord PersonalRecord) error {
 	return nil
 
 }
+
+func (m *DBModel) UpdatePersonalRecord(personalRecord PersonalRecord) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `update "personalRecords" 
+	set reps = $1,
+		weight = $2,
+		updated_at = $3
+	where exercise_id = $4`
+
+	_, err := m.DB.ExecContext(ctx, query,
+		personalRecord.Reps,
+		personalRecord.Weight,
+		personalRecord.UpdatedAt,
+		personalRecord.ExerciseId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

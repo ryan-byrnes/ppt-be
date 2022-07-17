@@ -15,5 +15,7 @@ func (app *application) routes() *httprouter.Router {
 
 	router.HandlerFunc(http.MethodPost, "/v1/add-personal-record", app.addPersonalRecord)
 
+	router.HandlerFunc(http.MethodPut, "/v1/update-personal-record/:exerciseId", app.updatePersonalRecord)
+
 	return router
 }

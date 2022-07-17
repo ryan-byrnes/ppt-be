@@ -37,8 +37,12 @@ type personalRecordPayload struct {
 	Weight       string `json:"weight"`
 }
 
+type jsonResp struct {
+	OK bool `json:"ok"`
+}
+
 func (app *application) addPersonalRecord(w http.ResponseWriter, r *http.Request) {
-	var payload personalRecordPayload
+	var payload *personalRecordPayload
 
 	err := json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
@@ -57,10 +61,6 @@ func (app *application) addPersonalRecord(w http.ResponseWriter, r *http.Request
 	personalRecord.CreatedAt = time.Now()
 	personalRecord.UpdatedAt = time.Now()
 
-	type jsonResp struct {
-		OK bool `json:"ok"`
-	}
-
 	ok := jsonResp{
 		OK: true,
 	}
@@ -77,4 +77,48 @@ func (app *application) addPersonalRecord(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+}
+
+func (app *application) updatePersonalRecord(w http.ResponseWriter, r *http.Request) {
+
+	params := httprouter.ParamsFromContext(r.Context())
+
+	id, err := strconv.Atoi(params.ByName("exerciseId"))
+	if err != nil {
+		app.logger.Print(errors.New("invalid exerciseId"))
+		app.errorJson(w, err)
+		return
+	}
+
+	var payload *personalRecordPayload
+
+	err = json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
+		app.logger.Println(err)
+		app.errorJson(w, err)
+		return
+	}
+
+	var personalRecord models.PersonalRecord
+
+	personalRecord.Reps, _ = strconv.Atoi(payload.Reps)
+	personalRecord.Weight, _ = strconv.Atoi(payload.Weight)
+	personalRecord.UpdatedAt = time.Now()
+	personalRecord.ExerciseId = id
+
+	ok := jsonResp{
+		OK: true,
+	}
+
+	err = app.writeJson(w, http.StatusOK, ok, "response")
+	if err != nil {
+		app.errorJson(w, err)
+		return
+	}
+
+	app.models.DB.UpdatePersonalRecord(personalRecord)
+	if err != nil {
+		app.errorJson(w, err)
+		return
+	}
 }
