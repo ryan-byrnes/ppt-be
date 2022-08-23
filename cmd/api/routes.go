@@ -6,7 +6,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func (app *application) routes() *httprouter.Router {
+func (app *application) routes() http.Handler {
 	router := httprouter.New()
 
 	router.HandlerFunc(http.MethodGet, "/status", app.statusHandler)
@@ -17,5 +17,5 @@ func (app *application) routes() *httprouter.Router {
 
 	router.HandlerFunc(http.MethodPut, "/v1/update-personal-record/:exerciseId", app.updatePersonalRecord)
 
-	return router
+	return app.enableCORS(router)
 }
