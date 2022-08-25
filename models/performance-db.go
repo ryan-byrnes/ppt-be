@@ -16,7 +16,7 @@ func (m *DBModel) GetAllPersonalRecords(id int) ([]*PersonalRecord, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `select "exercise_name", "reps", "weight" from "personalRecords" where "user_id" = $1`
+	query := `select "exercise_name", "reps", "weight", "exercise_id" from "personalRecords" where "user_id" = $1`
 
 	rows, _ := m.DB.QueryContext(ctx, query, id)
 	defer rows.Close()
@@ -30,6 +30,7 @@ func (m *DBModel) GetAllPersonalRecords(id int) ([]*PersonalRecord, error) {
 			&personalRecord.ExerciseName,
 			&personalRecord.Reps,
 			&personalRecord.Weight,
+			&personalRecord.ExerciseId,
 		)
 		if err != nil {
 			return nil, err
